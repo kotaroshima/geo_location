@@ -29,7 +29,7 @@ cake build-css
 Test
 ------
 * Before running tests, enable location sharing setting
-** Chrome : https://support.google.com/chrome/answer/142065?hl=en
+ * Chrome : https://support.google.com/chrome/answer/142065?hl=en
 * Open test/index.html with a browser
 
 Libraries Used
