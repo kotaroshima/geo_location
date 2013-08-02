@@ -31,6 +31,7 @@ Test
 * Before running tests, enable location sharing setting
  * Chrome : https://support.google.com/chrome/answer/142065?hl=en
 * Open test/index.html with a browser
+ * Or access the hosted version : http://kotaroshima.github.com/geo_location/test/
 
 Libraries Used
 --------
