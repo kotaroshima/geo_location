@@ -1,0 +1,7 @@
+<div class="location-item">
+  <div class="location-address-cell"><%- formatted_address %></div>
+  <div class="location-distance-cell">
+    <div><%- formatNumber(distance) %> (km)</div>
+    <div class="sub-text">(<%- formatNumber(geometry.location.lat) %>, <%- formatNumber(geometry.location.lng) %>)</div>
+  </div>
+</div>
