@@ -29,7 +29,6 @@ define(
               back: true
           subscribers:
             SHOW_VIEW: 'showChild'
-
         @$el.append @stackView.$el
         return
 )   

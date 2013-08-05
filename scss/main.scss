@@ -15,6 +15,7 @@ $default-bg-color: #E0E0E0;
 
 BODY {
   @include default-font;
+  height: 100%;
   padding: 0;
   margin: 0;
 }

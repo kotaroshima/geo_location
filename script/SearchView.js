@@ -35,6 +35,14 @@
           itemView: LocationItemView
         });
         this.$('#search-result-list').append(searchListView.$el);
+        this.mapView = new Backpack.GoogleMapView({
+          apiKey: 'AIzaSyDAJRmpbhxdAaoSYj2_iwaMEGxuxBR3YoM',
+          subscribers: {
+            INIT_GOOGLE_MAP: 'initMap',
+            GOOGLE_MAP_SCRIPT_LOADED: '_onScriptLoaded'
+          }
+        });
+        this.$('#map-container').append(this.mapView.$el);
       },
       /*
       * Renders template HTML
@@ -72,6 +80,7 @@
               return result;
             });
             _this.collection.reset([modelData[0]]);
+            _this.mapView.setLocation(modelData[0].geometry.location);
             Backbone.trigger('ADD_LOCATION_HISTORY', _this.collection.models, {
               at: 0
             });

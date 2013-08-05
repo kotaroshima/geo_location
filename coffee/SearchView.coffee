@@ -31,9 +31,12 @@ define(
           itemView: LocationItemView
         @$('#search-result-list').append searchListView.$el
 
-        #@mapView = new Backpack.GoogleMapView
-        #  apiKey: 'AIzaSyDAJRmpbhxdAaoSYj2_iwaMEGxuxBR3YoM'
-        #@$('#map-container').append @mapView.$el
+        @mapView = new Backpack.GoogleMapView
+          apiKey: 'AIzaSyDAJRmpbhxdAaoSYj2_iwaMEGxuxBR3YoM'
+          subscribers:
+            INIT_GOOGLE_MAP: 'initMap'
+            GOOGLE_MAP_SCRIPT_LOADED: '_onScriptLoaded'
+        @$('#map-container').append @mapView.$el
 
         return
 
@@ -64,7 +67,14 @@ define(
             modelData = _.map data.results, (result)=>
               result.distance = locationService.calculateDistance currentPos, result.geometry.location
               result
+
+            # update search result list view
             @collection.reset [modelData[0]]
+
+            # update center of Google map
+            @mapView.setLocation modelData[0].geometry.location
+
+            # add item to history list view
             Backbone.trigger 'ADD_LOCATION_HISTORY', @collection.models, { at:0 }
             @setLoading false
             return

@@ -34,6 +34,8 @@ require(
     Backbone.sync =->
 
     @$('#app-view').append new AppView().$el
+
+    # initialize Google Map after being added to the DOM tree
     Backbone.trigger 'INIT_GOOGLE_MAP'
     return
 )
