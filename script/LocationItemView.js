@@ -12,6 +12,7 @@
         'click .location-item': 'onClicked'
       },
       initialize: function(options) {
+        Backpack.View.prototype.initialize.apply(this, arguments);
         this.render();
       },
       render: function() {
@@ -31,14 +32,7 @@
         this.$el.html(this.template(data));
         return this;
       },
-      /*
-      * Click event handler for this item (row)
-      */
-
-      onClicked: function() {
-        Backbone.trigger('SEARCH_ADDRESS', this.model.attributes.formatted_address);
-        Backbone.trigger('SHOW_VIEW', 'searchView');
-      }
+      onClicked: function() {}
     });
   });
 

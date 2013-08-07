@@ -30,7 +30,13 @@
         });
         listView = this.listView = new Backpack.EditableListView({
           collection: collection,
-          itemView: LocationItemView
+          itemView: LocationItemView,
+          itemOptions: {
+            onClicked: function() {
+              Backbone.trigger('SEARCH_ADDRESS', this.model.attributes.formatted_address);
+              Backbone.trigger('SHOW_VIEW', 'searchView');
+            }
+          }
         });
         this.$('#history-list-container').append(listView.$el);
       },

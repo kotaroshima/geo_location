@@ -11,6 +11,7 @@ define(
         'click .location-item': 'onClicked'
 
       initialize:(options)->
+        Backpack.View::initialize.apply @, arguments
         @render()
         return
 
@@ -24,11 +25,5 @@ define(
         @$el.html @template data
         @
 
-      ###
-      * Click event handler for this item (row)
-      ###
       onClicked:->
-        Backbone.trigger 'SEARCH_ADDRESS', @model.attributes.formatted_address
-        Backbone.trigger 'SHOW_VIEW', 'searchView'
-        return
-)
+ )

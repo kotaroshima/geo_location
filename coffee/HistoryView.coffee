@@ -27,6 +27,11 @@ define(
         listView = @listView = new Backpack.EditableListView
           collection: collection
           itemView: LocationItemView
+          itemOptions:
+            onClicked:->
+              Backbone.trigger 'SEARCH_ADDRESS', @model.attributes.formatted_address
+              Backbone.trigger 'SHOW_VIEW', 'searchView'
+              return
         @$('#history-list-container').append listView.$el
 
         return
