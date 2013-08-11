@@ -51,50 +51,71 @@ define(
       * Click event handler for [Search] button
       ###
       onSearchButtonClicked:->
-        @doSearch $('#address-input').val()
+        @doSearch @$('#address-input').val(), =>
+          Backbone.trigger 'ADD_LOCATION_HISTORY', @collection.models, { at:0 }
+          return
         return
 
       ###
       * Makes API calls to get current location and search for a given address
       * @param {String} address an address to search for
+      * @param {Function} callback a callback function that gets called if both API call completes
       ###
-      doSearch:(address)->
+      doSearch:(address, callback)->
         @setLoading true
-        currentPos = null
-        searchCallbackObj =
-          success:(data)=>
-            console.log "search result: "+JSON.stringify(data)
-            modelData = _.map data.results, (result)=>
-              result.distance = locationService.calculateDistance currentPos, result.geometry.location
-              result
+
+        # update address input field
+        @$('#address-input').val address
+
+        self = @
+        batchAsync =
+          names: ['search', 'getCurrentLocation']
+          _batchData: {}
+          onComplete:(name, data)->
+            @_batchData[name] = data
+            if _.every @names, ((name)=> @_batchData[name] )
+              @onAllComplete()
+            return
+          # if both API call finished, calculate the distance between current location and searched address and update views
+          onAllComplete:()->
+            currentLoc = @_batchData['getCurrentLocation']
+            modelData = @_batchData['search']
+            modelData.distance = locationService.calculateDistance currentLoc, modelData.geometry.location
 
             # update search result list view
-            @collection.reset [modelData[0]]
+            self.collection.reset [modelData]
 
             # update center of Google map
-            @mapView.setLocation modelData[0].geometry.location
+            self.mapView.setLocation modelData.geometry.location
 
             # add item to history list view
-            Backbone.trigger 'ADD_LOCATION_HISTORY', @collection.models, { at:0 }
-            @setLoading false
+            callback() if callback && _.isFunction callback
+            self.setLoading false
             return
-          failure:(error)=>
-            @setLoading false
-            console.log 'search error: '+error
-            return
-        currentLocationCallbackObj =
+
+        # get current location
+        locationService.getCurrentLocation
           success:(pos)=>
-            currentPos =
-              lat: pos.coords.latitude
-              lng: pos.coords.longitude
             console.log "current position: "+JSON.stringify(pos)
-            locationService.search address, searchCallbackObj
+            batchAsync.onComplete 'getCurrentLocation', { lat: pos.coords.latitude, lng: pos.coords.longitude }
             return
           failure:(error)=>
             @setLoading false
             console.log 'current location error: '+error
+            # TODO : cancel search call
             return
-        locationService.getCurrentLocation currentLocationCallbackObj
+
+        # search for address
+        locationService.search address,
+          success:(data)=>
+            console.log "search result: "+JSON.stringify(data)
+            batchAsync.onComplete 'search', data.results[0]
+            return
+          failure:(error)=>
+            @setLoading false
+            console.log 'search error: '+error
+            # TODO : cancel getCurrentLocation call
+            return
         return
 
       ###
@@ -102,7 +123,7 @@ define(
       * @param {Boolean} isLoading a flag to specify loading mode or not
       ###
       setLoading:(isLoading)->
-        $('#search-result-container').toggleClass 'loading', isLoading
+        @$('#search-result-container').toggleClass 'loading', isLoading
         return
 
       ###

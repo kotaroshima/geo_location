@@ -57,55 +57,77 @@
       */
 
       onSearchButtonClicked: function() {
-        this.doSearch($('#address-input').val());
+        var _this = this;
+
+        this.doSearch(this.$('#address-input').val(), function() {
+          Backbone.trigger('ADD_LOCATION_HISTORY', _this.collection.models, {
+            at: 0
+          });
+        });
       },
       /*
       * Makes API calls to get current location and search for a given address
       * @param {String} address an address to search for
+      * @param {Function} callback a callback function that gets called if both API call completes
       */
 
-      doSearch: function(address) {
-        var currentLocationCallbackObj, currentPos, searchCallbackObj,
+      doSearch: function(address, callback) {
+        var batchAsync, self,
           _this = this;
 
         this.setLoading(true);
-        currentPos = null;
-        searchCallbackObj = {
-          success: function(data) {
-            var modelData;
+        this.$('#address-input').val(address);
+        self = this;
+        batchAsync = {
+          names: ['search', 'getCurrentLocation'],
+          _batchData: {},
+          onComplete: function(name, data) {
+            var _this = this;
 
-            console.log("search result: " + JSON.stringify(data));
-            modelData = _.map(data.results, function(result) {
-              result.distance = locationService.calculateDistance(currentPos, result.geometry.location);
-              return result;
-            });
-            _this.collection.reset([modelData[0]]);
-            _this.mapView.setLocation(modelData[0].geometry.location);
-            Backbone.trigger('ADD_LOCATION_HISTORY', _this.collection.models, {
-              at: 0
-            });
-            _this.setLoading(false);
+            this._batchData[name] = data;
+            if (_.every(this.names, (function(name) {
+              return _this._batchData[name];
+            }))) {
+              this.onAllComplete();
+            }
           },
-          failure: function(error) {
-            _this.setLoading(false);
-            console.log('search error: ' + error);
+          onAllComplete: function() {
+            var currentLoc, modelData;
+
+            currentLoc = this._batchData['getCurrentLocation'];
+            modelData = this._batchData['search'];
+            modelData.distance = locationService.calculateDistance(currentLoc, modelData.geometry.location);
+            self.collection.reset([modelData]);
+            self.mapView.setLocation(modelData.geometry.location);
+            if (callback && _.isFunction(callback)) {
+              callback();
+            }
+            self.setLoading(false);
           }
         };
-        currentLocationCallbackObj = {
+        locationService.getCurrentLocation({
           success: function(pos) {
-            currentPos = {
+            console.log("current position: " + JSON.stringify(pos));
+            batchAsync.onComplete('getCurrentLocation', {
               lat: pos.coords.latitude,
               lng: pos.coords.longitude
-            };
-            console.log("current position: " + JSON.stringify(pos));
-            locationService.search(address, searchCallbackObj);
+            });
           },
           failure: function(error) {
             _this.setLoading(false);
             console.log('current location error: ' + error);
           }
-        };
-        locationService.getCurrentLocation(currentLocationCallbackObj);
+        });
+        locationService.search(address, {
+          success: function(data) {
+            console.log("search result: " + JSON.stringify(data));
+            batchAsync.onComplete('search', data.results[0]);
+          },
+          failure: function(error) {
+            _this.setLoading(false);
+            console.log('search error: ' + error);
+          }
+        });
       },
       /*
       * Toggles loading mode of this view
@@ -113,7 +135,7 @@
       */
 
       setLoading: function(isLoading) {
-        $('#search-result-container').toggleClass('loading', isLoading);
+        this.$('#search-result-container').toggleClass('loading', isLoading);
       },
       /*
       * Click event handler for [History] button
