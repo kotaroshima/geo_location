@@ -72,61 +72,58 @@
       */
 
       doSearch: function(address, callback) {
-        var batchAsync, self,
+        var getCurrentLocation, search,
           _this = this;
 
         this.setLoading(true);
         this.$('#address-input').val(address);
-        self = this;
-        batchAsync = {
-          names: ['search', 'getCurrentLocation'],
-          _batchData: {},
-          onComplete: function(name, data) {
-            var _this = this;
+        getCurrentLocation = function() {
+          var dfd,
+            _this = this;
 
-            this._batchData[name] = data;
-            if (_.every(this.names, (function(name) {
-              return _this._batchData[name];
-            }))) {
-              this.onAllComplete();
+          dfd = $.Deferred();
+          locationService.getCurrentLocation({
+            success: function(pos) {
+              console.log("current position: " + JSON.stringify(pos));
+              dfd.resolve({
+                lat: pos.coords.latitude,
+                lng: pos.coords.longitude
+              });
+            },
+            failure: function(error) {
+              _this.setLoading(false);
+              console.log('current location error: ' + error);
+              dfd.reject();
             }
-          },
-          onAllComplete: function() {
-            var currentLoc, modelData;
-
-            currentLoc = this._batchData['getCurrentLocation'];
-            modelData = this._batchData['search'];
-            modelData.distance = locationService.calculateDistance(currentLoc, modelData.geometry.location);
-            self.collection.reset([modelData]);
-            self.mapView.setLocation(modelData.geometry.location);
-            if (callback && _.isFunction(callback)) {
-              callback();
-            }
-            self.setLoading(false);
-          }
+          });
+          return dfd.promise();
         };
-        locationService.getCurrentLocation({
-          success: function(pos) {
-            console.log("current position: " + JSON.stringify(pos));
-            batchAsync.onComplete('getCurrentLocation', {
-              lat: pos.coords.latitude,
-              lng: pos.coords.longitude
-            });
-          },
-          failure: function(error) {
-            _this.setLoading(false);
-            console.log('current location error: ' + error);
+        search = function() {
+          var dfd,
+            _this = this;
+
+          dfd = $.Deferred();
+          locationService.search(address, {
+            success: function(data) {
+              console.log("search result: " + JSON.stringify(data));
+              dfd.resolve(data.results[0]);
+            },
+            failure: function(error) {
+              _this.setLoading(false);
+              console.log('search error: ' + error);
+              dfd.reject();
+            }
+          });
+          return dfd.promise();
+        };
+        $.when(getCurrentLocation(), search()).done(function(currentLocation, searchData) {
+          searchData.distance = locationService.calculateDistance(currentLocation, searchData.geometry.location);
+          _this.collection.reset([searchData]);
+          _this.mapView.setLocation(searchData.geometry.location);
+          if (callback && _.isFunction(callback)) {
+            callback();
           }
-        });
-        locationService.search(address, {
-          success: function(data) {
-            console.log("search result: " + JSON.stringify(data));
-            batchAsync.onComplete('search', data.results[0]);
-          },
-          failure: function(error) {
-            _this.setLoading(false);
-            console.log('search error: ' + error);
-          }
+          return _this.setLoading(false);
         });
       },
       /*

@@ -67,55 +67,53 @@ define(
         # update address input field
         @$('#address-input').val address
 
-        self = @
-        batchAsync =
-          names: ['search', 'getCurrentLocation']
-          _batchData: {}
-          onComplete:(name, data)->
-            @_batchData[name] = data
-            if _.every @names, ((name)=> @_batchData[name] )
-              @onAllComplete()
-            return
-          # if both API call finished, calculate the distance between current location and searched address and update views
-          onAllComplete:()->
-            currentLoc = @_batchData['getCurrentLocation']
-            modelData = @_batchData['search']
-            modelData.distance = locationService.calculateDistance currentLoc, modelData.geometry.location
-
-            # update search result list view
-            self.collection.reset [modelData]
-
-            # update center of Google map
-            self.mapView.setLocation modelData.geometry.location
-
-            # add item to history list view
-            callback() if callback && _.isFunction callback
-            self.setLoading false
-            return
-
         # get current location
-        locationService.getCurrentLocation
-          success:(pos)=>
-            console.log "current position: "+JSON.stringify(pos)
-            batchAsync.onComplete 'getCurrentLocation', { lat: pos.coords.latitude, lng: pos.coords.longitude }
-            return
-          failure:(error)=>
-            @setLoading false
-            console.log 'current location error: '+error
-            # TODO : cancel search call
-            return
+        getCurrentLocation = ->
+          dfd = $.Deferred()
+          locationService.getCurrentLocation
+            success:(pos)=>
+              console.log "current position: "+JSON.stringify(pos)
+              #batchAsync.onComplete 'getCurrentLocation', { lat: pos.coords.latitude, lng: pos.coords.longitude }
+              dfd.resolve lat: pos.coords.latitude, lng: pos.coords.longitude
+              return
+            failure:(error)=>
+              @setLoading false
+              console.log 'current location error: '+error
+              # TODO : cancel search call
+              dfd.reject()
+              return
+          dfd.promise()
 
         # search for address
-        locationService.search address,
-          success:(data)=>
-            console.log "search result: "+JSON.stringify(data)
-            batchAsync.onComplete 'search', data.results[0]
-            return
-          failure:(error)=>
-            @setLoading false
-            console.log 'search error: '+error
-            # TODO : cancel getCurrentLocation call
-            return
+        search = ->
+          dfd = $.Deferred()
+          locationService.search address,
+            success:(data)=>
+              console.log "search result: "+JSON.stringify(data)
+              #batchAsync.onComplete 'search', data.results[0]
+              dfd.resolve data.results[0]
+              return
+            failure:(error)=>
+              @setLoading false
+              console.log 'search error: '+error
+              # TODO : cancel getCurrentLocation call
+              dfd.reject()
+              return
+          dfd.promise()
+
+        # update views when all api calls have finished
+        $.when(getCurrentLocation(), search()).done (currentLocation, searchData)=>
+          searchData.distance = locationService.calculateDistance currentLocation, searchData.geometry.location
+
+          # update search result list view
+          @collection.reset [searchData]
+
+          # update center of Google map
+          @mapView.setLocation searchData.geometry.location
+
+          # add item to history list view
+          callback() if callback && _.isFunction callback
+          @setLoading false
         return
 
       ###
