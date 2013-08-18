@@ -73,7 +73,6 @@ define(
           locationService.getCurrentLocation
             success:(pos)=>
               console.log "current position: "+JSON.stringify(pos)
-              #batchAsync.onComplete 'getCurrentLocation', { lat: pos.coords.latitude, lng: pos.coords.longitude }
               dfd.resolve lat: pos.coords.latitude, lng: pos.coords.longitude
               return
             failure:(error)=>
@@ -90,7 +89,6 @@ define(
           locationService.search address,
             success:(data)=>
               console.log "search result: "+JSON.stringify(data)
-              #batchAsync.onComplete 'search', data.results[0]
               dfd.resolve data.results[0]
               return
             failure:(error)=>
@@ -108,8 +106,10 @@ define(
           # update search result list view
           @collection.reset [searchData]
 
-          # update center of Google map
-          @mapView.setLocation searchData.geometry.location
+          # update of Google map
+          location = searchData.geometry.location
+          @mapView.setLocation location
+          @mapView.addMarker _.extend location, title: searchData.formatted_address
 
           # add item to history list view
           callback() if callback && _.isFunction callback

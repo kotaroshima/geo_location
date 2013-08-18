@@ -117,9 +117,15 @@
           return dfd.promise();
         };
         $.when(getCurrentLocation(), search()).done(function(currentLocation, searchData) {
+          var location;
+
           searchData.distance = locationService.calculateDistance(currentLocation, searchData.geometry.location);
           _this.collection.reset([searchData]);
-          _this.mapView.setLocation(searchData.geometry.location);
+          location = searchData.geometry.location;
+          _this.mapView.setLocation(location);
+          _this.mapView.addMarker(_.extend(location, {
+            title: searchData.formatted_address
+          }));
           if (callback && _.isFunction(callback)) {
             callback();
           }
