@@ -3,14 +3,22 @@
 // common
 
 @mixin default-font {
-  font-family: Verdana,Arial,Helvetica,sans-serif;
+  font-family: "proxima-nova-1", "proxima-nova-2", "Proxima Nova", "Helvetica", "Arial";
 }
 
 $default-bg-color: #E0E0E0;
+$main-border-color: #d5d5d5;
 
-@mixin main-vertical-border {
-  border-left: 1px solid $default-bg-color;
-  border-right: 1px solid $default-bg-color;
+@mixin round-corner($r) {
+  -moz-border-radius: $r;
+  border-radius: $r;
+}
+
+@mixin linear-gradient($color1, $color2) {
+  background-color: $color2;
+  background-image: -moz-linear-gradient($color1, $color2);
+  background-image: -webkit-linear-gradient($color1, $color2);
+  background-image: linear-gradient($color1, $color2);
 }
 
 BODY {
@@ -18,6 +26,21 @@ BODY {
   height: 100%;
   padding: 0;
   margin: 0;
+  text-align: center;
+}
+
+BODY > * {
+  margin: 0 auto;
+}
+
+* {
+  box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  -webkit-box-sizing: border-box;
+}
+
+H1 {
+  font-size: large;
 }
 
 .sub-text {
@@ -28,8 +51,9 @@ BODY {
 .header {
   display: table;
   width: 100%;
-  background-color: $default-bg-color;
-
+  @include linear-gradient(#fafafa, #eaeaea);
+  border: 1px solid $main-border-color;
+  
   > * {
     display: table-cell;
     vertical-align: middle;
@@ -54,8 +78,23 @@ BODY {
   }
 }
 
+BUTTON.standard-button {
+  @include round-corner(3px);
+  @include linear-gradient(#fafafa, #eaeaea);
+  border: 1px solid #ddd;
+  cursor: pointer;
+  color: #333;
+  font-weight: bold;
+  height: 24px;
+
+  &:hover {
+    @include linear-gradient(#eaeaea, #dadada);
+    border-color: #ccc;
+  }
+}
+
 .noItemsNode {
-  padding-top: 20px;
+  padding: 10px 0;
 }
 
 // search view
@@ -65,12 +104,17 @@ BODY {
 }
 
 .main-content {
-  @include main-vertical-border;
+  border-color:$main-border-color;
+  border-width: 0 1px 1px 1px;
+  border-style: solid;
 }
 
 .search-row {
   display: table;
   width: 100%;
+  @include linear-gradient(#f9f9f9, #f3f3f3);
+  padding: 5px 0;
+  border-bottom: 1px solid $main-border-color;
 
   > * {
     display: table-cell;
@@ -95,7 +139,7 @@ BODY {
 .loading {
   .loading-div {
     display: block;
-    padding-top: 20px;
+    padding: 10px 0;
     text-align: center;
   }
   #search-result-list {

@@ -1,9 +1,24 @@
 @CHARSET "UTF-8";
 BODY {
-  font-family: Verdana,Arial,Helvetica,sans-serif;
+  font-family: "proxima-nova-1", "proxima-nova-2", "Proxima Nova", "Helvetica", "Arial";
   height: 100%;
   padding: 0;
   margin: 0;
+  text-align: center;
+}
+
+BODY > * {
+  margin: 0 auto;
+}
+
+* {
+  box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  -webkit-box-sizing: border-box;
+}
+
+H1 {
+  font-size: large;
 }
 
 .sub-text {
@@ -14,7 +29,11 @@ BODY {
 .header {
   display: table;
   width: 100%;
-  background-color: #e0e0e0;
+  background-color: #eaeaea;
+  background-image: -moz-linear-gradient(#fafafa, #eaeaea);
+  background-image: -webkit-linear-gradient(#fafafa, #eaeaea);
+  background-image: linear-gradient(#fafafa, #eaeaea);
+  border: 1px solid #d5d5d5;
 }
 .header > * {
   display: table-cell;
@@ -36,8 +55,29 @@ BODY {
   padding-right: 10px;
 }
 
+BUTTON.standard-button {
+  -moz-border-radius: 3px;
+  border-radius: 3px;
+  background-color: #eaeaea;
+  background-image: -moz-linear-gradient(#fafafa, #eaeaea);
+  background-image: -webkit-linear-gradient(#fafafa, #eaeaea);
+  background-image: linear-gradient(#fafafa, #eaeaea);
+  border: 1px solid #dddddd;
+  cursor: pointer;
+  color: #333;
+  font-weight: bold;
+  height: 24px;
+}
+BUTTON.standard-button:hover {
+  background-color: #dadada;
+  background-image: -moz-linear-gradient(#eaeaea, #dadada);
+  background-image: -webkit-linear-gradient(#eaeaea, #dadada);
+  background-image: linear-gradient(#eaeaea, #dadada);
+  border-color: #ccc;
+}
+
 .noItemsNode {
-  padding-top: 20px;
+  padding: 10px 0;
 }
 
 #app-view {
@@ -45,13 +85,20 @@ BODY {
 }
 
 .main-content {
-  border-left: 1px solid #e0e0e0;
-  border-right: 1px solid #e0e0e0;
+  border-color: #d5d5d5;
+  border-width: 0 1px 1px 1px;
+  border-style: solid;
 }
 
 .search-row {
   display: table;
   width: 100%;
+  background-color: #f3f3f3;
+  background-image: -moz-linear-gradient(#f9f9f9, #f3f3f3);
+  background-image: -webkit-linear-gradient(#f9f9f9, #f3f3f3);
+  background-image: linear-gradient(#f9f9f9, #f3f3f3);
+  padding: 5px 0;
+  border-bottom: 1px solid #d5d5d5;
 }
 .search-row > * {
   display: table-cell;
@@ -72,7 +119,7 @@ BODY {
 
 .loading .loading-div {
   display: block;
-  padding-top: 20px;
+  padding: 10px 0;
   text-align: center;
 }
 .loading #search-result-list {
