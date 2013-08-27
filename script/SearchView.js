@@ -23,10 +23,24 @@
       */
 
       initialize: function(options) {
-        var collection, searchListView;
+        var collection, searchListView,
+          _this = this;
 
         Backpack.View.prototype.initialize.apply(this, arguments);
         this.render();
+        /* execute search when ENTER key is pressed
+        */
+
+        this.searchBox = this.$('#address-input');
+        this.searchBox.keyup(function(e) {
+          if (e.which === 13) {
+            _this.doSearch(_this.searchBox.val(), function() {
+              Backbone.trigger('ADD_LOCATION_HISTORY', _this.collection.models, {
+                at: 0
+              });
+            });
+          }
+        });
         collection = this.collection = new Backpack.Collection(null, {
           model: Backpack.Model
         });
@@ -59,7 +73,7 @@
       onSearchButtonClicked: function() {
         var _this = this;
 
-        this.doSearch(this.$('#address-input').val(), function() {
+        this.doSearch(this.searchBox.val(), function() {
           Backbone.trigger('ADD_LOCATION_HISTORY', _this.collection.models, {
             at: 0
           });

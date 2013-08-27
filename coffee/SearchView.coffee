@@ -23,6 +23,15 @@ define(
         Backpack.View::initialize.apply @, arguments
         @render()
 
+        ### execute search when ENTER key is pressed ###
+        @searchBox = @$ '#address-input'
+        @searchBox.keyup (e)=>
+          if e.which == 13
+            @doSearch @searchBox.val(), =>
+              Backbone.trigger 'ADD_LOCATION_HISTORY', @collection.models, { at:0 }
+              return
+          return
+
         collection = @collection = new Backpack.Collection null,
           model: Backpack.Model
 
@@ -51,7 +60,7 @@ define(
       * Click event handler for [Search] button
       ###
       onSearchButtonClicked:->
-        @doSearch @$('#address-input').val(), =>
+        @doSearch @searchBox.val(), =>
           Backbone.trigger 'ADD_LOCATION_HISTORY', @collection.models, { at:0 }
           return
         return
