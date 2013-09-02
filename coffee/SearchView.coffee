@@ -16,6 +16,10 @@ define(
       subscribers:
         SEARCH_ADDRESS: 'doSearch'
 
+      messages:
+        ADDRESS_EMPTY: '<span style="color:red;">Please enter address to search</span>'
+        ADDRESS_NOT_FOUND: '<span style="color:red;">Address not found</span>'
+
       ###
       * Sets up main view
       ###
@@ -38,6 +42,8 @@ define(
         searchListView = new Backpack.ListView
           collection: collection
           itemView: LocationItemView
+          subscribers:
+            UPDATE_SEARCH_RESULT: 'toggleContainerNode'
         @$('#search-result-list').append searchListView.$el
 
         @mapView = new Backpack.GoogleMapView
@@ -71,13 +77,15 @@ define(
       * @param {Function} callback a callback function that gets called if both API call completes
       ###
       doSearch:(address, callback)->
+        return Backbone.trigger 'UPDATE_SEARCH_RESULT', false, @messages.ADDRESS_EMPTY if !address || address.length == 0
+
         @setLoading true
 
         # update address input field
         @$('#address-input').val address
 
         # get current location
-        getCurrentLocation = ->
+        getCurrentLocation = =>
           dfd = $.Deferred()
           locationService.getCurrentLocation
             success:(pos)=>
@@ -93,12 +101,12 @@ define(
           dfd.promise()
 
         # search for address
-        search = ->
+        search = =>
           dfd = $.Deferred()
           locationService.search address,
             success:(data)=>
               console.log "search result: "+JSON.stringify(data)
-              dfd.resolve data.results[0]
+              dfd.resolve data
               return
             failure:(error)=>
               @setLoading false
@@ -110,6 +118,11 @@ define(
 
         # update views when all api calls have finished
         $.when(getCurrentLocation(), search()).done (currentLocation, searchData)=>
+          @setLoading false
+
+          return Backbone.trigger 'UPDATE_SEARCH_RESULT', false, @messages.ADDRESS_NOT_FOUND if !searchData || searchData.results.length == 0
+
+          searchData = searchData.results[0]
           searchData.distance = locationService.calculateDistance currentLocation, searchData.geometry.location
 
           # update search result list view
@@ -122,7 +135,7 @@ define(
 
           # add item to history list view
           callback() if callback && _.isFunction callback
-          @setLoading false
+          return
         return
 
       ###

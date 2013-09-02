@@ -18,6 +18,10 @@
       subscribers: {
         SEARCH_ADDRESS: 'doSearch'
       },
+      messages: {
+        ADDRESS_EMPTY: '<span style="color:red;">Please enter address to search</span>',
+        ADDRESS_NOT_FOUND: '<span style="color:red;">Address not found</span>'
+      },
       /*
       * Sets up main view
       */
@@ -46,7 +50,10 @@
         });
         searchListView = new Backpack.ListView({
           collection: collection,
-          itemView: LocationItemView
+          itemView: LocationItemView,
+          subscribers: {
+            UPDATE_SEARCH_RESULT: 'toggleContainerNode'
+          }
         });
         this.$('#search-result-list').append(searchListView.$el);
         this.mapView = new Backpack.GoogleMapView({
@@ -89,11 +96,13 @@
         var getCurrentLocation, search,
           _this = this;
 
+        if (!address || address.length === 0) {
+          return Backbone.trigger('UPDATE_SEARCH_RESULT', false, this.messages.ADDRESS_EMPTY);
+        }
         this.setLoading(true);
         this.$('#address-input').val(address);
         getCurrentLocation = function() {
-          var dfd,
-            _this = this;
+          var dfd;
 
           dfd = $.Deferred();
           locationService.getCurrentLocation({
@@ -113,14 +122,13 @@
           return dfd.promise();
         };
         search = function() {
-          var dfd,
-            _this = this;
+          var dfd;
 
           dfd = $.Deferred();
           locationService.search(address, {
             success: function(data) {
               console.log("search result: " + JSON.stringify(data));
-              dfd.resolve(data.results[0]);
+              dfd.resolve(data);
             },
             failure: function(error) {
               _this.setLoading(false);
@@ -133,6 +141,11 @@
         $.when(getCurrentLocation(), search()).done(function(currentLocation, searchData) {
           var location;
 
+          _this.setLoading(false);
+          if (!searchData || searchData.results.length === 0) {
+            return Backbone.trigger('UPDATE_SEARCH_RESULT', false, _this.messages.ADDRESS_NOT_FOUND);
+          }
+          searchData = searchData.results[0];
           searchData.distance = locationService.calculateDistance(currentLocation, searchData.geometry.location);
           _this.collection.reset([searchData]);
           location = searchData.geometry.location;
@@ -143,7 +156,6 @@
           if (callback && _.isFunction(callback)) {
             callback();
           }
-          return _this.setLoading(false);
         });
       },
       /*

@@ -33,7 +33,8 @@ require(
     ### override so that it won't try to save to server ###
     Backbone.sync =->
 
-    @$('#app-view').append new AppView().$el
+    new AppView
+      el: '#app-view'
 
     # initialize Google Map after being added to the DOM tree
     Backbone.trigger 'INIT_GOOGLE_MAP'

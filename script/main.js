@@ -43,7 +43,9 @@
     /* override so that it won't try to save to server
     */
     Backbone.sync = function() {};
-    this.$('#app-view').append(new AppView().$el);
+    new AppView({
+      el: '#app-view'
+    });
     Backbone.trigger('INIT_GOOGLE_MAP');
   });
 
