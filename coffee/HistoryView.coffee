@@ -22,7 +22,13 @@ define(
         collection = @collection = new Backpack.Collection null,
           model: Backpack.Model
           subscribers:
-            ADD_LOCATION_HISTORY: 'add'
+            ADD_LOCATION_HISTORY: 'addLocationHistory'
+          addLocationHistory:(models, options)->
+            return if !models || models.length == 0
+            formatted_address = models[0].get 'formatted_address'
+            found = _.find collection.models, (m)->
+              formatted_address == m.get 'formatted_address'
+            @add.apply @, arguments if (!found || found.length == 0)
 
         listView = @listView = new Backpack.EditableListView
           collection: collection

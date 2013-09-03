@@ -25,7 +25,21 @@
         collection = this.collection = new Backpack.Collection(null, {
           model: Backpack.Model,
           subscribers: {
-            ADD_LOCATION_HISTORY: 'add'
+            ADD_LOCATION_HISTORY: 'addLocationHistory'
+          },
+          addLocationHistory: function(models, options) {
+            var formatted_address, found;
+
+            if (!models || models.length === 0) {
+              return;
+            }
+            formatted_address = models[0].get('formatted_address');
+            found = _.find(collection.models, function(m) {
+              return formatted_address === m.get('formatted_address');
+            });
+            if (!found || found.length === 0) {
+              return this.add.apply(this, arguments);
+            }
           }
         });
         listView = this.listView = new Backpack.EditableListView({
