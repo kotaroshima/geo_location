@@ -6,6 +6,8 @@ define(
   (_, Backpack, viewTemplate)->
     Backpack.View.extend
       template: _.template viewTemplate
+      attributes:
+        class: 'location-item'
 
       events:
         'click .location-item': 'onClicked'

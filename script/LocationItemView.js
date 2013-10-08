@@ -8,6 +8,9 @@
   define(['Underscore', 'Backpack', 'text!template/LocationItemView.html'], function(_, Backpack, viewTemplate) {
     return Backpack.View.extend({
       template: _.template(viewTemplate),
+      attributes: {
+        "class": 'location-item'
+      },
       events: {
         'click .location-item': 'onClicked'
       },
