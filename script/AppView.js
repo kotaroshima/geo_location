@@ -25,11 +25,11 @@
           children: [searchView, historyView],
           navigationEvents: {
             searchView: {
-              event: 'onHistoryButtonClicked',
+              event: 'onHistoryButtonClick',
               target: 'historyView'
             },
             historyView: {
-              event: 'onBackButtonClicked',
+              event: 'onBackButtonClick',
               back: true
             }
           },

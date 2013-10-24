@@ -12,8 +12,8 @@
     return Backpack.View.extend({
       template: _.template(viewTemplate),
       events: {
-        'click #search-button': 'onSearchButtonClicked',
-        'click #history-button': 'onHistoryButtonClicked'
+        'click #search-button': 'onSearchButtonClick',
+        'click #history-button': 'onHistoryButtonClick'
       },
       subscribers: {
         SEARCH_ADDRESS: 'doSearch'
@@ -77,11 +77,11 @@
       * Click event handler for [Search] button
       */
 
-      onSearchButtonClicked: function() {
+      onSearchButtonClick: function() {
         var _this = this;
 
         this.doSearch(this.searchBox.val(), function() {
-          Backbone.trigger('ADD_LOCATION_HISTORY', _this.collection.models, {
+          Backbone.trigger('ADD_LOCATION_HISTORY', [_this.collection.at(0).clone()], {
             at: 0
           });
         });
@@ -170,7 +170,7 @@
       * Click event handler for [History] button
       */
 
-      onHistoryButtonClicked: function() {}
+      onHistoryButtonClick: function() {}
     });
   });
 

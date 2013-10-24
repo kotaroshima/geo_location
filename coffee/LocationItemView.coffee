@@ -10,7 +10,7 @@ define(
         class: 'location-item'
 
       events:
-        'click .location-item': 'onClicked'
+        'click .location-item': 'onClick'
 
       initialize:(options)->
         Backpack.View::initialize.apply @, arguments
@@ -19,13 +19,12 @@ define(
 
       render:->
         # add view helper to format numbers
-        data = _.extend @model.attributes, {
+        data = _.extend @model.attributes,
           formatNumber: (num, precision=2)->
             pow = Math.pow 10, precision
             Math.round(num*pow)/pow
-        }
         @$el.html @template data
         @
 
-      onClicked:->
+      onClick:->
  )

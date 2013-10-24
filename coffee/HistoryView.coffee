@@ -8,9 +8,9 @@ define(
       template: _.template viewTemplate
 
       events:
-        'click #history-back-button': 'onBackButtonClicked'
-        'click #history-edit-button': 'onEditButtonClicked'
-        'click #history-done-button': 'onDoneButtonClicked'
+        'click #history-back-button': 'onBackButtonClick'
+        'click #history-edit-button': 'onEditButtonClick'
+        'click #history-done-button': 'onDoneButtonClick'
 
       ###
       * Sets up history view
@@ -34,7 +34,7 @@ define(
           collection: collection
           itemView: LocationItemView
           itemOptions:
-            onClicked:->
+            onClick:->
               Backbone.trigger 'SEARCH_ADDRESS', @model.attributes.formatted_address
               Backbone.trigger 'SHOW_VIEW', 'searchView'
               return
@@ -62,7 +62,7 @@ define(
       * Click event handler for [Back] button
       * When clicked, it returns to search view
       ###
-      onBackButtonClicked:->
+      onBackButtonClick:->
         @setEditable false
         return
 
@@ -70,7 +70,7 @@ define(
       * Click event handler for [Edit] button
       * When clicked, it enters edit mode
       ###
-      onEditButtonClicked:->
+      onEditButtonClick:->
         @setEditable true
         return
 
@@ -78,7 +78,7 @@ define(
       * Click event handler for [Done] button
       * When clicked, it exits edit mode
       ###
-      onDoneButtonClicked:->
+      onDoneButtonClick:->
         @setEditable false
         return
 )

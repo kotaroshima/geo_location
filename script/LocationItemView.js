@@ -12,7 +12,7 @@
         "class": 'location-item'
       },
       events: {
-        'click .location-item': 'onClicked'
+        'click .location-item': 'onClick'
       },
       initialize: function(options) {
         Backpack.View.prototype.initialize.apply(this, arguments);
@@ -35,7 +35,7 @@
         this.$el.html(this.template(data));
         return this;
       },
-      onClicked: function() {}
+      onClick: function() {}
     });
   });
 

@@ -9,9 +9,9 @@
     return Backpack.View.extend({
       template: _.template(viewTemplate),
       events: {
-        'click #history-back-button': 'onBackButtonClicked',
-        'click #history-edit-button': 'onEditButtonClicked',
-        'click #history-done-button': 'onDoneButtonClicked'
+        'click #history-back-button': 'onBackButtonClick',
+        'click #history-edit-button': 'onEditButtonClick',
+        'click #history-done-button': 'onDoneButtonClick'
       },
       /*
       * Sets up history view
@@ -46,7 +46,7 @@
           collection: collection,
           itemView: LocationItemView,
           itemOptions: {
-            onClicked: function() {
+            onClick: function() {
               Backbone.trigger('SEARCH_ADDRESS', this.model.attributes.formatted_address);
               Backbone.trigger('SHOW_VIEW', 'searchView');
             }
@@ -76,7 +76,7 @@
       * When clicked, it returns to search view
       */
 
-      onBackButtonClicked: function() {
+      onBackButtonClick: function() {
         this.setEditable(false);
       },
       /*
@@ -84,7 +84,7 @@
       * When clicked, it enters edit mode
       */
 
-      onEditButtonClicked: function() {
+      onEditButtonClick: function() {
         this.setEditable(true);
       },
       /*
@@ -92,7 +92,7 @@
       * When clicked, it exits edit mode
       */
 
-      onDoneButtonClicked: function() {
+      onDoneButtonClick: function() {
         this.setEditable(false);
       }
     });

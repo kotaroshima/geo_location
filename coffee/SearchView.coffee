@@ -10,8 +10,8 @@ define(
       template: _.template viewTemplate
 
       events:
-        'click #search-button': 'onSearchButtonClicked'
-        'click #history-button': 'onHistoryButtonClicked'
+        'click #search-button': 'onSearchButtonClick'
+        'click #history-button': 'onHistoryButtonClick'
 
       subscribers:
         SEARCH_ADDRESS: 'doSearch'
@@ -65,9 +65,9 @@ define(
       ###
       * Click event handler for [Search] button
       ###
-      onSearchButtonClicked:->
+      onSearchButtonClick:->
         @doSearch @searchBox.val(), =>
-          Backbone.trigger 'ADD_LOCATION_HISTORY', @collection.models, { at:0 }
+          Backbone.trigger 'ADD_LOCATION_HISTORY', [@collection.at(0).clone()], { at:0 }
           return
         return
 
@@ -149,5 +149,5 @@ define(
       ###
       * Click event handler for [History] button
       ###
-      onHistoryButtonClicked:->
+      onHistoryButtonClick:->
 )
