@@ -6,25 +6,23 @@ module.exports = (grunt) ->
     pkg: grunt.file.readJSON('package.json')
     watch:
       scripts:
-        files: ['coffee/*.coffee']
+        files: ['coffee/**/*.coffee']
         tasks: ['coffee']
       styles:
-        files: ['scss/*.scss']
-        tasks: ['sass','concat:styles']
+        files: ['scss/**/*.scss']
+        tasks: ['sass']
     coffee:
       all:
         expand: true
-        flatten: true
         cwd: 'coffee'
-        src: ['*.coffee'],
+        src: ['**/*.coffee'],
         dest: 'script',
         ext: '.js'
     sass:
       all:
         expand: true
-        flatten: true
         cwd: 'scss'
-        src: ['*.scss'],
+        src: ['**/*.scss'],
         dest: '.tmp',
         ext: '.css'
     concat:
@@ -32,10 +30,8 @@ module.exports = (grunt) ->
         files:
           'css/main.css': [
             '.tmp/main.css'
-            'script/lib/backpack/css/ActionView.css'
-            'script/lib/backpack/css/EditableListView.css'
           ]
-    concurrent:
-      all: ['coffee','sass']
+    #concurrent: # disabling it for now since it is so slow...
+    #  all: ['coffee','sass']
 
-  grunt.registerTask 'default', ['concurrent']
+  grunt.registerTask 'default', ['coffee','sass','concat:styles']
